@@ -95,7 +95,22 @@ export default class IDBWrapper {
 
     return TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
       const store = transaction.objectStore(storeName);
-      return TransactionManager.promisifyRequest(store.put(data, key));
+
+      return new Promise((resolve, reject) => {
+        const getRequest = store.get(key);
+        getRequest.onsuccess = () => {
+          const existing = getRequest.result;
+          if (!existing) {
+            reject(new Error('Record not found'));
+            return;
+          }
+          const updatedData = { ...existing, ...data };
+          const putRequest = store.put(updatedData);
+          putRequest.onsuccess = () => resolve();
+          putRequest.onerror = () => reject(new TransactionError('Put failed', putRequest.error));
+        };
+        getRequest.onerror = () => reject(new TransactionError('Get failed', getRequest.error));
+      });
     });
   }
 
@@ -119,13 +134,28 @@ export default class IDBWrapper {
    * Queries records with filters
    * @param {string} storeName - Object store name
    * @param {Object} filters - Query filters
+   * @param {Object} options - Query options (limit, offset, sort)
    * @returns {Promise<Array>} Matching records
    */
-  async query(storeName, filters = {}) {
+  async query(storeName, filters = {}, options = {}) {
     const db = this.getDatabase();
     if (!db) throw new Error('Database not open');
 
-    return QueryEngine.query(db, storeName, filters);
+    return QueryEngine.query(db, storeName, filters, options);
+  }
+
+  /**
+   * Analyzes a query plan without executing it
+   * @param {string} storeName - Object store name
+   * @param {Object} filters - Query filters
+   * @param {Object} options - Query options
+   * @returns {Promise<Object>} Query analysis with cost estimation
+   */
+  async analyzeQuery(storeName, filters = {}, options = {}) {
+    const db = this.getDatabase();
+    if (!db) throw new Error('Database not open');
+
+    return QueryEngine.analyzeQueryPlan(db, storeName, filters, options);
   }
 
   /**

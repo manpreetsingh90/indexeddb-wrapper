@@ -52,7 +52,10 @@ export default class TransactionManager {
   static promisifyRequest(request) {
     return new Promise((resolve, reject) => {
       request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(new TransactionError('Request failed', request.error));
+      request.onerror = () => {
+        console.error('IDBRequest failed:', request.error.name, request.error.message);
+        reject(new TransactionError(`Request failed: ${request.error.name} - ${request.error.message}`, request.error));
+      };
     });
   }
 }

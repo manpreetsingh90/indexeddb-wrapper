@@ -21,7 +21,8 @@ export default class ConnectionManager {
    */
   open() {
     return new Promise((resolve, reject) => {
-      if (!window.indexedDB) {
+      const indexedDB = globalThis.indexedDB || window?.indexedDB;
+      if (!indexedDB) {
         reject(new ConnectionError('IndexedDB not supported'));
         return;
       }

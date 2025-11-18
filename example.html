@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB Wrapper Example</title>
+</head>
+<body>
+    <h1>IndexedDB Wrapper Test</h1>
+    <div id="output"></div>
+
+    <script type="module">
+        import { IDBWrapper } from './dist/index.mjs';
+
+        const output = document.getElementById('output');
+
+        async function testLibrary() {
+            try {
+                output.innerHTML += '<p>Initializing database...</p>';
+
+                const schema = {
+                    stores: {
+                        users: {
+                            keyPath: 'id',
+                            autoIncrement: true,
+                            indexes: {
+                                email: { unique: true }
+                            }
+                        }
+                    }
+                };
+
+                const db = new IDBWrapper('testdb', 1, schema);
+                await db.open();
+
+                output.innerHTML += '<p>Database opened successfully.</p>';
+
+                // Create a user
+                const userId = await db.create('users', { name: 'John Doe', email: 'john@example.com' });
+                output.innerHTML += `<p>Created user with ID: ${userId}</p>`;
+
+                // Read the user
+                const user = await db.read('users', userId);
+                output.innerHTML += `<p>Read user: ${JSON.stringify(user)}</p>`;
+
+                // Update the user
+                await db.update('users', userId, { name: 'Johnny Doe', email: 'john@example.com' });
+                output.innerHTML += '<p>User updated.</p>';
+
+                // Query users
+                const users = await db.query('users', { name: 'Johnny Doe' });
+                output.innerHTML += `<p>Query results: ${users.length} users found</p>`;
+
+                // Delete the user
+                await db.delete('users', userId);
+                output.innerHTML += '<p>User deleted.</p>';
+
+                db.close();
+                output.innerHTML += '<p>Database closed. All tests passed!</p>';
+
+            } catch (error) {
+                output.innerHTML += `<p style="color: red;">Error: ${error.message}</p>`;
+                console.error(error);
+            }
+        }
+
+        // Run the test when page loads
+        testLibrary();
+    </script>
+</body>
+</html>
