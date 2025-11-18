@@ -187,4 +187,59 @@ export default class IDBWrapper {
       return Promise.all(promises);
     });
   }
+
+  /**
+   * Executes operations within a safe transaction context
+   * @param {string|string[]} storeNames - Store name(s) for the transaction
+   * @param {string} mode - Transaction mode ('readonly' or 'readwrite')
+   * @param {Function} callback - Function to execute within transaction
+   * @param {Object} options - Transaction options
+   * @returns {Promise} Result of the callback
+   */
+  async withTransaction(storeNames, mode, callback, options = {}) {
+    const db = this.getDatabase();
+    if (!db) throw new Error('Database not open');
+
+    const transactionOptions = {
+      timeout: options.timeout || 5000,
+      strictAsync: options.strictAsync !== false, // Default to strict
+      ...options
+    };
+
+    return TransactionManager.execute(db, storeNames, mode, callback, transactionOptions);
+  }
+
+  /**
+   * Performs a safe bulk operation with transaction guarantees
+   * @param {string} storeName - Object store name
+   * @param {Array} operations - Array of operations
+   * @param {Object} options - Transaction options
+   * @returns {Promise<Array>} Results of operations
+   */
+  async safeBulk(storeName, operations, options = {}) {
+    return this.withTransaction(storeName, 'readwrite', async (transaction) => {
+      const store = transaction.objectStore(storeName);
+      const results = [];
+
+      for (const op of operations) {
+        let result;
+        switch (op.type) {
+          case 'create':
+            result = await TransactionManager.promisifyRequest(store.add(op.data));
+            break;
+          case 'update':
+            result = await TransactionManager.promisifyRequest(store.put(op.data, op.id));
+            break;
+          case 'delete':
+            result = await TransactionManager.promisifyRequest(store.delete(op.id));
+            break;
+          default:
+            throw new Error(`Unknown operation type: ${op.type}`);
+        }
+        results.push(result);
+      }
+
+      return results;
+    }, options);
+  }
 }
