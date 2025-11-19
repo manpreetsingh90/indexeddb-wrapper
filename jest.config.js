@@ -7,4 +7,7 @@ export default {
   transform: {
     '^.+\\.js$': 'babel-jest',
   },
+  testPathIgnorePatterns: [
+    '<rootDir>/tests/browser/' // Exclude browser tests from Jest
+  ],
 };

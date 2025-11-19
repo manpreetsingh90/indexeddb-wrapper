@@ -2,6 +2,7 @@ import ConnectionManager from './ConnectionManager.js';
 import SchemaManager from './SchemaManager.js';
 import TransactionManager from './TransactionManager.js';
 import QueryEngine from './QueryEngine.js';
+import PerformanceUtils from './PerformanceUtils.js';
 
 /**
  * Main IndexedDB wrapper class
@@ -60,10 +61,15 @@ export default class IDBWrapper {
     const db = this.getDatabase();
     if (!db) throw new Error('Database not open');
 
-    return TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
-      const store = transaction.objectStore(storeName);
-      return TransactionManager.promisifyRequest(store.add(data));
-    });
+    // Monitor performance for large objects
+    PerformanceUtils.logPerformanceWarning('IDBWrapper.create', data, { storeName });
+
+    return PerformanceUtils.monitorTransaction(`create(${storeName})`, () =>
+      TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
+        const store = transaction.objectStore(storeName);
+        return TransactionManager.promisifyRequest(store.add(data));
+      })
+    ).then(result => result.result);
   }
 
   /**
@@ -93,25 +99,30 @@ export default class IDBWrapper {
     const db = this.getDatabase();
     if (!db) throw new Error('Database not open');
 
-    return TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
-      const store = transaction.objectStore(storeName);
+    // Monitor performance for large objects
+    PerformanceUtils.logPerformanceWarning('IDBWrapper.update', data, { storeName, key });
 
-      return new Promise((resolve, reject) => {
-        const getRequest = store.get(key);
-        getRequest.onsuccess = () => {
-          const existing = getRequest.result;
-          if (!existing) {
-            reject(new Error('Record not found'));
-            return;
-          }
-          const updatedData = { ...existing, ...data };
-          const putRequest = store.put(updatedData);
-          putRequest.onsuccess = () => resolve();
-          putRequest.onerror = () => reject(new TransactionError('Put failed', putRequest.error));
-        };
-        getRequest.onerror = () => reject(new TransactionError('Get failed', getRequest.error));
-      });
-    });
+    return PerformanceUtils.monitorTransaction(`update(${storeName})`, () =>
+      TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
+        const store = transaction.objectStore(storeName);
+
+        return new Promise((resolve, reject) => {
+          const getRequest = store.get(key);
+          getRequest.onsuccess = () => {
+            const existing = getRequest.result;
+            if (!existing) {
+              reject(new Error('Record not found'));
+              return;
+            }
+            const updatedData = { ...existing, ...data };
+            const putRequest = store.put(updatedData);
+            putRequest.onsuccess = () => resolve();
+            putRequest.onerror = () => reject(new TransactionError('Put failed', putRequest.error));
+          };
+          getRequest.onerror = () => reject(new TransactionError('Get failed', getRequest.error));
+        });
+      })
+    ).then(result => result.result);
   }
 
   /**
@@ -141,7 +152,9 @@ export default class IDBWrapper {
     const db = this.getDatabase();
     if (!db) throw new Error('Database not open');
 
-    return QueryEngine.query(db, storeName, filters, options);
+    return PerformanceUtils.monitorTransaction(`query(${storeName})`, () =>
+      QueryEngine.query(db, storeName, filters, options)
+    ).then(result => result.result);
   }
 
   /**
@@ -168,24 +181,36 @@ export default class IDBWrapper {
     const db = this.getDatabase();
     if (!db) throw new Error('Database not open');
 
-    return TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
-      const store = transaction.objectStore(storeName);
+    // Monitor performance for bulk operations
+    const totalSize = operations.reduce((size, op) => {
+      return size + PerformanceUtils.calculateObjectSize(op.data || {});
+    }, 0);
 
-      const promises = operations.map(op => {
-        switch (op.type) {
-          case 'create':
-            return TransactionManager.promisifyRequest(store.add(op.data));
-          case 'update':
-            return TransactionManager.promisifyRequest(store.put(op.data, op.id));
-          case 'delete':
-            return TransactionManager.promisifyRequest(store.delete(op.id));
-          default:
-            throw new Error(`Unknown operation type: ${op.type}`);
-        }
-      });
-
-      return Promise.all(promises);
+    PerformanceUtils.logPerformanceWarning('IDBWrapper.bulk', { operations, totalSize }, {
+      storeName,
+      operationCount: operations.length
     });
+
+    return PerformanceUtils.monitorTransaction(`bulk(${storeName}, ${operations.length} ops)`, () =>
+      TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
+        const store = transaction.objectStore(storeName);
+
+        const promises = operations.map(op => {
+          switch (op.type) {
+            case 'create':
+              return TransactionManager.promisifyRequest(store.add(op.data));
+            case 'update':
+              return TransactionManager.promisifyRequest(store.put(op.data, op.id));
+            case 'delete':
+              return TransactionManager.promisifyRequest(store.delete(op.id));
+            default:
+              throw new Error(`Unknown operation type: ${op.type}`);
+          }
+        });
+
+        return Promise.all(promises);
+      })
+    ).then(result => result.result);
   }
 
   /**
