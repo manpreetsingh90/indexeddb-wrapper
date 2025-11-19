@@ -1,0 +1,79 @@
+<testsuites id="" name="" tests="7" failures="1" skipped="0" errors="0" time="11.084457">
+<testsuite name="indexeddb-compatibility.spec.js" timestamp="2025-11-19T03:02:57.534Z" hostname="chromium" tests="7" failures="1" skipped="0" time="20.003" errors="0">
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › IndexedDB is supported in browser" classname="indexeddb-compatibility.spec.js" time="4.024">
+<system-out>
+<![CDATA[✅ IndexedDB supported in chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Basic CRUD operations work" classname="indexeddb-compatibility.spec.js" time="2.766">
+<system-out>
+<![CDATA[✅ CRUD operations work in chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Transaction safety works" classname="indexeddb-compatibility.spec.js" time="2.742">
+<system-out>
+<![CDATA[✅ Transaction safety works in chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Migration system works" classname="indexeddb-compatibility.spec.js" time="2.591">
+<failure message="indexeddb-compatibility.spec.js:146:3 Migration system works" type="FAILURE">
+<![CDATA[  [chromium] › indexeddb-compatibility.spec.js:146:3 › IndexedDB Wrapper - Cross-Browser Compatibility › Migration system works 
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: true
+    Received: false
+
+      191 |     });
+      192 |
+    > 193 |     expect(result.success).toBe(true);
+          |                            ^
+      194 |     expect(result.recordCreated).toBe(true);
+      195 |     expect(result.recordRead).toBe(true);
+      196 |
+        at c:\Github\indexeddb-wrapper\tests\browser\indexeddb-compatibility.spec.js:193:28
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    ..\..\test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    attachment #2: video (video/webm) ──────────────────────────────────────────────────────────────
+    ..\..\test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\video.webm
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: ..\..\test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\error-context.md
+]]>
+</failure>
+<system-out>
+<![CDATA[
+[[ATTACHMENT|test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\test-failed-1.png]]
+
+[[ATTACHMENT|test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\video.webm]]
+
+[[ATTACHMENT|test-results\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\error-context.md]]
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Error handling works correctly" classname="indexeddb-compatibility.spec.js" time="2.562">
+<system-out>
+<![CDATA[✅ Error handling works in chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Query optimization works" classname="indexeddb-compatibility.spec.js" time="2.626">
+<system-out>
+<![CDATA[✅ Query optimization works in chromium
+]]>
+</system-out>
+</testcase>
+<testcase name="IndexedDB Wrapper - Cross-Browser Compatibility › Large dataset handling" classname="indexeddb-compatibility.spec.js" time="2.692">
+<system-out>
+<![CDATA[✅ Large dataset handling works in chromium
+]]>
+</system-out>
+</testcase>
+</testsuite>
+</testsuites>

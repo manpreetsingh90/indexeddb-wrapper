@@ -1,0 +1,495 @@
+{
+  "config": {
+    "configFile": "c:\\Github\\indexeddb-wrapper\\playwright.config.js",
+    "rootDir": "c:/Github/indexeddb-wrapper/tests/browser",
+    "forbidOnly": false,
+    "fullyParallel": true,
+    "globalSetup": "c:\\Github\\indexeddb-wrapper\\tests\\browser\\global-setup.js",
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {
+      "actualWorkers": 7
+    },
+    "preserveOutput": "always",
+    "reporter": [
+      [
+        "html",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "test-results.json"
+        }
+      ],
+      [
+        "junit",
+        {
+          "outputFile": "test-results.xml"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "quiet": false,
+    "projects": [
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "firefox",
+        "name": "firefox",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "webkit",
+        "name": "webkit",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Mobile Chrome",
+        "name": "Mobile Chrome",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Mobile Safari",
+        "name": "Mobile Safari",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Microsoft Edge",
+        "name": "Microsoft Edge",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      },
+      {
+        "outputDir": "c:/Github/indexeddb-wrapper/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {
+          "actualWorkers": 7
+        },
+        "id": "Google Chrome",
+        "name": "Google Chrome",
+        "testDir": "c:/Github/indexeddb-wrapper/tests/browser",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 30000
+      }
+    ],
+    "shard": null,
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.56.1",
+    "workers": 8,
+    "webServer": {
+      "command": "npm run serve:test",
+      "url": "http://localhost:3000",
+      "reuseExistingServer": true
+    }
+  },
+  "suites": [
+    {
+      "title": "indexeddb-compatibility.spec.js",
+      "file": "indexeddb-compatibility.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "IndexedDB Wrapper - Cross-Browser Compatibility",
+          "file": "indexeddb-compatibility.spec.js",
+          "line": 8,
+          "column": 6,
+          "specs": [
+            {
+              "title": "IndexedDB is supported in browser",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4024,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ IndexedDB supported in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.680Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-9da22c423fa875f3549b",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 22,
+              "column": 3
+            },
+            {
+              "title": "Basic CRUD operations work",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 1,
+                      "status": "passed",
+                      "duration": 2766,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ CRUD operations work in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.664Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-858e180f050a0001c279",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 32,
+              "column": 3
+            },
+            {
+              "title": "Transaction safety works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 2,
+                      "status": "passed",
+                      "duration": 2742,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Transaction safety works in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.685Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-9f268bf5690568fd8d6b",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 99,
+              "column": 3
+            },
+            {
+              "title": "Migration system works",
+              "ok": false,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 3,
+                      "status": "failed",
+                      "duration": 2591,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n    at c:\\Github\\indexeddb-wrapper\\tests\\browser\\indexeddb-compatibility.spec.js:193:28",
+                        "location": {
+                          "file": "c:\\Github\\indexeddb-wrapper\\tests\\browser\\indexeddb-compatibility.spec.js",
+                          "column": 28,
+                          "line": 193
+                        },
+                        "snippet": "\u001b[0m \u001b[90m 191 |\u001b[39m     })\u001b[33m;\u001b[39m\n \u001b[90m 192 |\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 193 |\u001b[39m     expect(result\u001b[33m.\u001b[39msuccess)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m     |\u001b[39m                            \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 194 |\u001b[39m     expect(result\u001b[33m.\u001b[39mrecordCreated)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 195 |\u001b[39m     expect(result\u001b[33m.\u001b[39mrecordRead)\u001b[33m.\u001b[39mtoBe(\u001b[36mtrue\u001b[39m)\u001b[33m;\u001b[39m\n \u001b[90m 196 |\u001b[39m\u001b[0m"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "c:\\Github\\indexeddb-wrapper\\tests\\browser\\indexeddb-compatibility.spec.js",
+                            "column": 28,
+                            "line": 193
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoBe\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // Object.is equality\u001b[22m\n\nExpected: \u001b[32mtrue\u001b[39m\nReceived: \u001b[31mfalse\u001b[39m\n\n  191 |     });\n  192 |\n> 193 |     expect(result.success).toBe(true);\n      |                            ^\n  194 |     expect(result.recordCreated).toBe(true);\n  195 |     expect(result.recordRead).toBe(true);\n  196 |\n    at c:\\Github\\indexeddb-wrapper\\tests\\browser\\indexeddb-compatibility.spec.js:193:28"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.681Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "screenshot",
+                          "contentType": "image/png",
+                          "path": "c:\\Github\\indexeddb-wrapper\\test-results\\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\\test-failed-1.png"
+                        },
+                        {
+                          "name": "video",
+                          "contentType": "video/webm",
+                          "path": "c:\\Github\\indexeddb-wrapper\\test-results\\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\\video.webm"
+                        },
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "c:\\Github\\indexeddb-wrapper\\test-results\\indexeddb-compatibility-In-90e06-lity-Migration-system-works-chromium\\error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "c:\\Github\\indexeddb-wrapper\\tests\\browser\\indexeddb-compatibility.spec.js",
+                        "column": 28,
+                        "line": 193
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-2ed53bdbcb2b0bd6dedd",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 146,
+              "column": 3
+            },
+            {
+              "title": "Error handling works correctly",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 4,
+                      "status": "passed",
+                      "duration": 2562,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Error handling works in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.698Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-728daf22be54147a554d",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 200,
+              "column": 3
+            },
+            {
+              "title": "Query optimization works",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 5,
+                      "status": "passed",
+                      "duration": 2626,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Query optimization works in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.682Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-3e413fb9ea7e51544670",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 262,
+              "column": 3
+            },
+            {
+              "title": "Large dataset handling",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 6,
+                      "status": "passed",
+                      "duration": 2692,
+                      "errors": [],
+                      "stdout": [
+                        {
+                          "text": "✅ Large dataset handling works in chromium\n"
+                        }
+                      ],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2025-11-19T03:02:58.729Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
+                }
+              ],
+              "id": "5e619236abfe1130cbd6-9423616834e325adace2",
+              "file": "indexeddb-compatibility.spec.js",
+              "line": 327,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2025-11-19T03:02:53.530Z",
+    "duration": 11084.457,
+    "expected": 6,
+    "skipped": 0,
+    "unexpected": 1,
+    "flaky": 0
+  }
+}

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IndexedDB Wrapper - Browser Compatibility Test</title>
+</head>
+<body>
+    <h1>IndexedDB Wrapper Browser Test</h1>
+    <div id="status">Loading...</div>
+    <div id="results"></div>
+
+    <script type="module">
+        import { IDBWrapper } from './dist/index.mjs';
+
+        // Make library available globally for tests
+        window.IDBWrapper = IDBWrapper;
+
+        // Update status
+        document.getElementById('status').textContent = 'Library loaded successfully';
+
+        // Basic functionality test
+        async function basicTest() {
+            try {
+                const results = document.getElementById('results');
+
+                const schema = {
+                    stores: {
+                        test_store: {
+                            keyPath: 'id',
+                            autoIncrement: true
+                        }
+                    }
+                };
+
+                const db = new IDBWrapper('browser_test', 1, schema);
+                await db.open();
+
+                const testId = await db.create('test_store', { data: 'Browser test successful' });
+                const testRecord = await db.read('test_store', testId);
+
+                results.innerHTML = `
+                    <p>✅ Database operations successful</p>
+                    <p>Created record ID: ${testId}</p>
+                    <p>Record data: ${JSON.stringify(testRecord)}</p>
+                `;
+
+                await db.close();
+
+            } catch (error) {
+                document.getElementById('results').innerHTML = `
+                    <p>❌ Test failed: ${error.message}</p>
+                `;
+                console.error('Browser test error:', error);
+            }
+        }
+
+        // Run basic test
+        basicTest();
+    </script>
+</body>
+</html>
