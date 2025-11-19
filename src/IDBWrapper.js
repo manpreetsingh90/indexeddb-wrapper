@@ -4,14 +4,26 @@ import TransactionManager from './TransactionManager.js';
 import QueryEngine from './QueryEngine.js';
 import PerformanceUtils from './PerformanceUtils.js';
 import TabCoordinator from './TabCoordinator.js';
+import SecurityUtils from './SecurityUtils.js';
 
 /**
  * Main IndexedDB wrapper class
  */
 export default class IDBWrapper {
   constructor(dbName, version, schema, migrations = [], options = {}) {
-    // Validate schema upfront
-    SchemaManager.validateSchema(schema);
+    // Security validation
+    SecurityUtils.validateDatabaseName(dbName);
+    SecurityUtils.validateSchema(schema);
+
+    if (migrations) {
+      if (Array.isArray(migrations)) {
+        migrations.forEach((migration, index) => {
+          if (typeof migration === 'function') {
+            SecurityUtils.validateMigrationFunction(migration);
+          }
+        });
+      }
+    }
 
     this.dbName = dbName;
     this.version = version;
@@ -19,15 +31,16 @@ export default class IDBWrapper {
     this.migrations = migrations;
     this.options = {
       enableTabCoordination: true,
+      enableSecurityValidation: true,
       ...options
     };
-
-    this.connectionManager = new ConnectionManager(dbName, version, schema, migrations, this.tabCoordinator);
 
     // Initialize tab coordination if enabled
     if (this.options.enableTabCoordination && typeof BroadcastChannel !== 'undefined') {
       this.tabCoordinator = new TabCoordinator(dbName);
     }
+
+    this.connectionManager = new ConnectionManager(dbName, version, schema, migrations, this.tabCoordinator);
   }
 
   /**
@@ -99,17 +112,26 @@ export default class IDBWrapper {
    * @returns {Promise} Resolves with the key
    */
   async create(storeName, data) {
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+      SecurityUtils.validateDataObject(data, `create(${storeName}) data`);
+    }
+
     return this.withCoordination(`write-${storeName}`, async () => {
       const db = this.getDatabase();
       if (!db) throw new Error('Database not open');
 
+      // Create safe copy for storage
+      const safeData = SecurityUtils.createSafeCopy(data);
+
       // Monitor performance for large objects
-      PerformanceUtils.logPerformanceWarning('IDBWrapper.create', data, { storeName });
+      PerformanceUtils.logPerformanceWarning('IDBWrapper.create', safeData, { storeName });
 
       return PerformanceUtils.monitorTransaction(`create(${storeName})`, () =>
         TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
           const store = transaction.objectStore(storeName);
-          return TransactionManager.promisifyRequest(store.add(data));
+          return TransactionManager.promisifyRequest(store.add(safeData));
         })
       ).then(result => result.result);
     });
@@ -122,12 +144,22 @@ export default class IDBWrapper {
    * @returns {Promise} Resolves with the record or undefined
    */
   async read(storeName, key) {
-    const db = this.getDatabase();
-    if (!db) throw new Error('Database not open');
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+      SecurityUtils.validateKey(key);
+    }
 
-    return TransactionManager.execute(db, storeName, 'readonly', (transaction) => {
-      const store = transaction.objectStore(storeName);
-      return TransactionManager.promisifyRequest(store.get(key));
+    return this.withCoordination(`read-${storeName}`, async () => {
+      const db = this.getDatabase();
+      if (!db) throw new Error('Database not open');
+
+      return PerformanceUtils.monitorTransaction(`read(${storeName})`, () =>
+        TransactionManager.execute(db, storeName, 'readonly', (transaction) => {
+          const store = transaction.objectStore(storeName);
+          return TransactionManager.promisifyRequest(store.get(key));
+        })
+      ).then(result => result.result);
     });
   }
 
@@ -139,12 +171,22 @@ export default class IDBWrapper {
    * @returns {Promise} Resolves when updated
    */
   async update(storeName, key, data) {
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+      SecurityUtils.validateKey(key);
+      SecurityUtils.validateDataObject(data, `update(${storeName}) data`);
+    }
+
     return this.withCoordination(`write-${storeName}`, async () => {
       const db = this.getDatabase();
       if (!db) throw new Error('Database not open');
 
+      // Create safe copy for storage
+      const safeData = SecurityUtils.createSafeCopy(data);
+
       // Monitor performance for large objects
-      PerformanceUtils.logPerformanceWarning('IDBWrapper.update', data, { storeName, key });
+      PerformanceUtils.logPerformanceWarning('IDBWrapper.update', safeData, { storeName, key });
 
       return PerformanceUtils.monitorTransaction(`update(${storeName})`, () =>
         TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
@@ -158,7 +200,7 @@ export default class IDBWrapper {
                 reject(new Error('Record not found'));
                 return;
               }
-              const updatedData = { ...existing, ...data };
+              const updatedData = { ...existing, ...safeData };
               const putRequest = store.put(updatedData);
               putRequest.onsuccess = () => resolve();
               putRequest.onerror = () => reject(new TransactionError('Put failed', putRequest.error));
@@ -177,6 +219,12 @@ export default class IDBWrapper {
    * @returns {Promise} Resolves when deleted
    */
   async delete(storeName, key) {
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+      SecurityUtils.validateKey(key);
+    }
+
     return this.withCoordination(`write-${storeName}`, async () => {
       const db = this.getDatabase();
       if (!db) throw new Error('Database not open');
@@ -198,6 +246,12 @@ export default class IDBWrapper {
    * @returns {Promise<Array>} Matching records
    */
   async query(storeName, filters = {}, options = {}) {
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+      SecurityUtils.validateQueryFilters(filters);
+    }
+
     return this.withCoordination(`read-${storeName}`, async () => {
       const db = this.getDatabase();
       if (!db) throw new Error('Database not open');
@@ -229,16 +283,70 @@ export default class IDBWrapper {
    * @returns {Promise<Array>} Results of operations
    */
   async bulk(storeName, operations) {
+    // Security validation
+    if (this.options.enableSecurityValidation) {
+      SecurityUtils.validateStoreName(storeName);
+
+      if (!Array.isArray(operations)) {
+        throw new Error('Bulk operations must be an array');
+      }
+
+      if (operations.length === 0) {
+        throw new Error('Bulk operations array cannot be empty');
+      }
+
+      if (operations.length > 1000) {
+        throw new Error('Bulk operations cannot exceed 1000 items');
+      }
+
+      operations.forEach((op, index) => {
+        if (!op || typeof op !== 'object') {
+          throw new Error(`Bulk operation ${index} must be an object`);
+        }
+
+        if (!op.type || typeof op.type !== 'string') {
+          throw new Error(`Bulk operation ${index} must have a valid type`);
+        }
+
+        if (!['create', 'update', 'delete'].includes(op.type)) {
+          throw new Error(`Bulk operation ${index} has invalid type: ${op.type}`);
+        }
+
+        if (op.type !== 'delete' && !op.data) {
+          throw new Error(`Bulk operation ${index} (${op.type}) must have data`);
+        }
+
+        if ((op.type === 'update' || op.type === 'delete') && op.id === undefined) {
+          throw new Error(`Bulk operation ${index} (${op.type}) must have an id`);
+        }
+
+        // Validate individual operation data
+        if (op.data) {
+          SecurityUtils.validateDataObject(op.data, `bulk operation ${index} data`);
+        }
+
+        if (op.id !== undefined) {
+          SecurityUtils.validateKey(op.id);
+        }
+      });
+    }
+
     return this.withCoordination(`bulk-${storeName}`, async () => {
       const db = this.getDatabase();
       if (!db) throw new Error('Database not open');
 
+      // Create safe copies for all operations
+      const safeOperations = operations.map(op => ({
+        ...op,
+        data: op.data ? SecurityUtils.createSafeCopy(op.data) : undefined
+      }));
+
       // Monitor performance for bulk operations
-      const totalSize = operations.reduce((size, op) => {
+      const totalSize = safeOperations.reduce((size, op) => {
         return size + PerformanceUtils.calculateObjectSize(op.data || {});
       }, 0);
 
-      PerformanceUtils.logPerformanceWarning('IDBWrapper.bulk', { operations, totalSize }, {
+      PerformanceUtils.logPerformanceWarning('IDBWrapper.bulk', { operations: safeOperations, totalSize }, {
         storeName,
         operationCount: operations.length
       });
@@ -247,7 +355,7 @@ export default class IDBWrapper {
         TransactionManager.execute(db, storeName, 'readwrite', (transaction) => {
           const store = transaction.objectStore(storeName);
 
-          const promises = operations.map(op => {
+          const promises = safeOperations.map(op => {
             switch (op.type) {
               case 'create':
                 return TransactionManager.promisifyRequest(store.add(op.data));
