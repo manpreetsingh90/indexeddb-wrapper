@@ -54,6 +54,9 @@ export default class SchemaManager {
   static createSchema(db, schema) {
     this.validateSchema(schema);
 
+    // Create migration metadata store first
+    this.createMigrationStore(db);
+
     for (const [storeName, storeConfig] of Object.entries(schema.stores)) {
       if (!db.objectStoreNames.contains(storeName)) {
         const store = db.createObjectStore(storeName, {
@@ -70,6 +73,20 @@ export default class SchemaManager {
           }
         }
       }
+    }
+  }
+
+  /**
+   * Creates the migration metadata store
+   * @param {IDBDatabase} db - The database instance
+   */
+  static createMigrationStore(db) {
+    const MIGRATION_STORE = '_migration_meta';
+
+    if (!db.objectStoreNames.contains(MIGRATION_STORE)) {
+      db.createObjectStore(MIGRATION_STORE, {
+        keyPath: 'id'
+      });
     }
   }
 

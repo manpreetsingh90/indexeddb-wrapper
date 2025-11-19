@@ -43,7 +43,11 @@ export default class ConnectionManager {
         this.db = request.result;
         if (this.oldVersion < this.version) {
           try {
-            await MigrationManager.runMigrations(this.db, this.migrations, this.oldVersion, this.version);
+            // Convert legacy migration format to new format if needed
+            const normalizedMigrations = this.normalizeMigrations(this.migrations);
+            // Get store names from schema for transaction scopes
+            const storeNames = Object.keys(this.schema.stores || {});
+            await MigrationManager.runMigrations(this.db, normalizedMigrations, this.oldVersion, this.version, storeNames);
           } catch (error) {
             reject(error);
             return;
@@ -78,5 +82,37 @@ export default class ConnectionManager {
    */
   getDatabase() {
     return this.db;
+  }
+
+  /**
+   * Normalizes migrations from legacy format to new format
+   * @param {Array} migrations - Migration functions or objects
+   * @returns {Array} Normalized migration objects
+   */
+  normalizeMigrations(migrations) {
+    if (!migrations || !Array.isArray(migrations)) {
+      return [];
+    }
+
+    return migrations.map((migration, index) => {
+      // If it's already a migration object, return as-is
+      if (migration && typeof migration === 'object' && migration.id) {
+        return migration;
+      }
+
+      // Convert legacy function to migration object
+      if (typeof migration === 'function') {
+        return {
+          id: `migration_${index + 1}`,
+          version: index + 1,
+          up: migration,
+          checkpointed: false
+        };
+      }
+
+      // Invalid migration
+      console.warn(`Invalid migration at index ${index}:`, migration);
+      return null;
+    }).filter(Boolean);
   }
 }
