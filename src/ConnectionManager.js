@@ -6,11 +6,12 @@ import MigrationManager from './MigrationManager.js';
  * Manages IndexedDB database connections
  */
 export default class ConnectionManager {
-  constructor(dbName, version, schema, migrations = []) {
+  constructor(dbName, version, schema, migrations = [], tabCoordinator = null) {
     this.dbName = dbName;
     this.version = version;
     this.schema = schema;
     this.migrations = migrations;
+    this.tabCoordinator = tabCoordinator;
     this.db = null;
     this.oldVersion = 0;
   }
@@ -36,6 +37,12 @@ export default class ConnectionManager {
       request.onupgradeneeded = (event) => {
         this.db = event.target.result;
         this.oldVersion = event.oldVersion;
+
+        // Announce migration start if coordinator available
+        if (this.tabCoordinator && this.oldVersion < this.version) {
+          this.tabCoordinator.announceMigrationStart(`upgrade-${this.oldVersion}-${this.version}`, this.version);
+        }
+
         SchemaManager.createSchema(this.db, this.schema);
       };
 
@@ -48,6 +55,11 @@ export default class ConnectionManager {
             // Get store names from schema for transaction scopes
             const storeNames = Object.keys(this.schema.stores || {});
             await MigrationManager.runMigrations(this.db, normalizedMigrations, this.oldVersion, this.version, storeNames);
+
+            // Announce migration completion
+            if (this.tabCoordinator) {
+              this.tabCoordinator.announceMigrationComplete(`upgrade-${this.oldVersion}-${this.version}`, this.version);
+            }
           } catch (error) {
             reject(error);
             return;
